@@ -1,0 +1,32 @@
+name: NOAA Kankakee CSV Build v2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tools/noaa_kankakee_build_v2.py'
+      - '.github/workflows/noaa-kankakee-build-v2.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip pandas numpy requests psychrolib
+      - name: Build and validate NOAA CSV
+        run: python tools/noaa_kankakee_build_v2.py
+      - name: Upload result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kankakee-noaa-hourly-csv-v2
+          path: |
+            Kankakee_Kensing_NOAA_Hourly_WetBulb_Weather_2011-08-26_to_2026-08-26.csv
+            Kankakee_Kensing_NOAA_Hourly_WetBulb_QA.json
+          if-no-files-found: error
+          retention-days: 1
